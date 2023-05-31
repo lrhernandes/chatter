@@ -4,6 +4,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -11,53 +12,91 @@ import {
   View,
 } from "react-native";
 
-export default function Home() {
-  const chats = [
-    {
-      title: "Marcos",
-      headshot:
-        "https://i1.wp.com/files.agro20.com.br/uploads/2019/10/vaca-2.jpg?fit=1024%2C681&ssl=1",
-      lastMessage: "Olá, tudo bem?",
-      date: "Mar 3",
-    },
-    {
-      title: "Fernando",
-      headshot: null,
-      lastMessage: "Olá, tudo bem?",
-      date: "Mar 3",
-    },
-    {
-      title: "Maria",
-      headshot: null,
-      lastMessage: "Olá, tudo bem?",
-      date: "Mar 3",
-    },
-    {
-      title: "Camila Vargas",
-      headshot:
-        "https://img.freepik.com/fotos-gratis/estilo-de-vida-beleza-e-moda-conceito-de-emocoes-de-pessoas-jovem-gerente-de-escritorio-feminino-asiatico-ceo-com-expressao-satisfeita-em-pe-sobre-um-fundo-branco-sorrindo-com-os-bracos-cruzados-sobre-o-peito_1258-59329.jpg",
-      lastMessage: "Olá, tudo bem?",
-      date: "Yesterday",
-    },
-    {
-      title: "Carlos Henrique",
-      headshot:
-        "https://conteudo.imguol.com.br/c/entretenimento/36/2022/05/22/gata-tricolor-gato-gatos-1653265224214_v2_3x4.jpg",
-      lastMessage:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet.",
-      date: "Mar 10",
-    },
-  ];
+import chats from "../../chats.mock";
 
+function ConfigItem({ value }) {
+  return (
+    <TouchableOpacity>
+      <View style={modal.item}>
+        <Text>{value}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function Chat({ item }) {
+  return (
+    <TouchableOpacity>
+      <View style={chat.container}>
+        <Image
+          source={
+            item.headshot
+              ? { uri: item.headshot }
+              : require("../../assets/user.jpg")
+          }
+          style={{ width: 50, height: 50, borderRadius: 100 }}
+        />
+        <View style={chat.data}>
+          <View style={chat.header}>
+            <Text style={chat.name} numberOfLines={1}>
+              {item.title}
+            </Text>
+            <Text style={chat.date}>{item.date}</Text>
+          </View>
+          <Text numberOfLines={1} style={chat.message}>
+            {item.lastMessage}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+export default function Home() {
   const [showSearch, setShowSearch] = useState(false);
+  const [showConfig, setShowConfig] = useState(false);
 
   return (
     <>
       <StatusBar style="auto" />
 
+      {/* Config modal */}
+      <Modal
+        animationType="fade"
+        visible={showConfig}
+        transparent
+        style={modal.wrapper}
+        onRequestClose={() => {
+          setShowConfig(false);
+        }}
+      >
+        <TouchableOpacity
+          style={modal.wrapper}
+          activeOpacity={1}
+          onPressOut={() => {
+            setShowConfig(false);
+          }}
+        >
+          <View style={modal.container}>
+            <ConfigItem value={"Item 1"} />
+            <ConfigItem value={"Item 2"} />
+            <ConfigItem value={"Item 3"} />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
       {/* Navbar */}
       <View style={navbar.container}>
-        <Text style={navbar.title}>CHATTER</Text>
+        {showSearch ? (
+          <TextInput
+            autoFocus
+            style={navbar.input}
+            placeholder="Pesquisar..."
+          />
+        ) : (
+          <Text style={navbar.title}>CHATTER</Text>
+        )}
+
         <View style={navbar.iconsWrapper}>
           <TouchableOpacity
             onPress={() => {
@@ -69,7 +108,11 @@ export default function Home() {
               source={require("../../assets/search.png")}
             ></Image>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setShowConfig(!showConfig);
+            }}
+          >
             <Image
               style={navbar.menu}
               source={require("../../assets/menu.png")}
@@ -79,48 +122,45 @@ export default function Home() {
       </View>
 
       {/* Chats */}
-      <View style={styles.container}>
-        {showSearch && (
-          <TextInput
-            style={navbar.input}
-            placeholder="Pesquisar..."
-            // onSubmitEditing={Keyboard.dismiss}
-          />
-        )}
+      <View style={chat.wrapper}>
         <FlatList
           data={chats}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <View style={chat.container}>
-                <Image
-                  source={
-                    item.headshot
-                      ? { uri: item.headshot }
-                      : require("../../assets/user.jpg")
-                  }
-                  style={{ width: 50, height: 50, borderRadius: 100 }}
-                />
-                <View style={chat.data}>
-                  <View style={chat.header}>
-                    <Text style={chat.name} numberOfLines={1}>
-                      {item.title}
-                    </Text>
-                    <Text style={chat.date}>{item.date}</Text>
-                  </View>
-                  <Text numberOfLines={1} style={chat.message}>
-                    {item.lastMessage}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
+          renderItem={({ item }) => <Chat item={item} />}
         />
       </View>
     </>
   );
 }
+const modal = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    width: 200,
+    right: 5,
+    marginTop: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    elevation: 12,
+  },
+  wrapper: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "flex-end",
+  },
+  item: {
+    padding: 10,
+  },
+});
 
 const chat = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+  },
   container: {
     flexDirection: "row",
     marginTop: 10,
@@ -159,12 +199,6 @@ const chat = StyleSheet.create({
   },
 });
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
 const navbar = StyleSheet.create({
   container: {
     marginTop: 29,
@@ -180,13 +214,12 @@ const navbar = StyleSheet.create({
   },
   input: {
     paddingHorizontal: 15,
-    paddingVertical: 4,
-    borderWidth: 0.5,
+    paddingVertical: 2,
+    borderWidth: 1,
     borderRadius: 4,
-    marginBottom: 10,
-    marginLeft: 15,
-    marginRight: 15,
     borderColor: "#7c58e6",
+    flex: 1,
+    marginRight: 20,
   },
   title: {
     fontSize: 25,
@@ -202,7 +235,7 @@ const navbar = StyleSheet.create({
     marginRight: 10,
   },
   menu: {
-    width: 10,
+    width: 20,
     height: 30,
   },
 });
