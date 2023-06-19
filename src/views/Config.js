@@ -36,10 +36,12 @@ export default function Config() {
       const value = await AsyncStorage.getItem("avatar");
       if (value !== null) {
         setAvatar(value);
+      } else {
+        setLoadingAvatar(true);
+        getAvatar();
       }
     } catch (error) {
-      setLoadingAvatar(true);
-      getAvatar();
+      console.error(error);
     }
   }
 
