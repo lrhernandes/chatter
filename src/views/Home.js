@@ -13,10 +13,12 @@ import {
 } from "react-native";
 
 import chats from "../../chats.mock";
+import { useNavigation } from "@react-navigation/native";
 
 function ConfigItem({ value }) {
+  const navigation = useNavigation();
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => navigation.navigate("Config")}>
       <View style={modal.item}>
         <Text>{value}</Text>
       </View>
@@ -78,9 +80,7 @@ export default function Home() {
           }}
         >
           <View style={modal.container}>
-            <ConfigItem value={"Item 1"} />
-            <ConfigItem value={"Item 2"} />
-            <ConfigItem value={"Item 3"} />
+            <ConfigItem value={"Configurações"} />
           </View>
         </TouchableOpacity>
       </Modal>
